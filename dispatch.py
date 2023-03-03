@@ -1,5 +1,5 @@
 import argparse
-import datetime as dt
+from datetime import datetime
 import json
 import pathlib
 import subprocess
@@ -43,11 +43,9 @@ def Argparser():
 ## few rather generic  constants
 ARGS = Argparser()
 PATH = pathlib.Path().absolute()
-DEFAULT_GEOFENCE = [f"{PATH}/athens_dactylios.geojson"]
-DEFAULT_POINTS = [f"{PATH}/point_movement.geojson"]
 
 
-class Generic_Mixin:
+class Generics:
 	"""Convenient class Mixin to
 	properly set Unix timestamps
 
@@ -89,24 +87,25 @@ class Generic_Mixin:
 		# fallback in case OS does not have kdialog/ zenity
 		while True:
 			try:
-				cmd_output = pathlib.Path(input("Enter filepath manually"))
-				if pathlib.Path(cmd_output).exists():
+				cmd_output = input("Enter filepath manually")
+				if pathlib.Path(cmd_output).is_file() and pathlib.Path(cmd_output).suffix == ".geojson":
 					break
-				elif cmd_output not in ("X", "x"):
-					print("retry or [X] for exit")
-					break
+				elif cmd_output in ("X", "x"):
+					exit("Exiting...")
+
 				else:
+					print("retry or [X] for exit")
 					continue
 
 			except KeyboardInterrupt:
 				exit("You must provide a (valid) filepath to continue")
-		return cmd_output.as_posix()
+		return pathlib.Path(cmd_output).as_posix()
 
 	def open_file(self, ):
 
 		# figuring if there are enviromental variables
 		# to use for easier file opening
-		return self._zenity_dialog(prompt_title="Open File", ) if True else self.fallback_prompt()
+		return self._zenity_dialog(prompt_title="Open File", ) or self.fallback_prompt()
 
 	###//TODO
 
@@ -128,13 +127,13 @@ class win32_promptDialog():
 	pass
 
 
-class Enviroment(Generic_Mixin):
+class Enviroment(Generics):
 	"""
 	main class that contains all essential components of a test.
 
 	"""
 
-	timestamp = Generic_Mixin.timestamp
+	timestamp = Generics.timestamp
 
 	BASE_SCTRUCTURE = {
 		'type': 'FeatureCollection',
@@ -207,10 +206,10 @@ class Enviroment(Generic_Mixin):
 		fleet_point_coords = [feature.get('geometry').get("coordinates") for feature in
 		                      self._get_features(paths)]
 
-		return Fleet_vessel(self, name, fleet=fleet_point_coords)
+		return FleetVessel(self, name, fleet=fleet_point_coords)
 
 
-class Fleet_vessel(Generic_Mixin):
+class FleetVessel(Generics):
 
 	def __init__(self, context: Enviroment, name: str, fleet: list):
 
@@ -272,7 +271,7 @@ class Fleet_vessel(Generic_Mixin):
 		return self.context.client.execute_command("DROP", "{obj}".format(obj=self.name))
 
 
-class Webhook(Generic_Mixin):
+class Webhook(Generics):
 	ZONES = {"cross", "enter", "exit", "inside", "outside"}
 
 	def __init__(
@@ -354,76 +353,3 @@ class Webhook(Generic_Mixin):
 		# drops the webhook
 		return self.context.client.execute_command("PDELHOOK", "{obj}".format(obj=self.name))
 
-
-# @@@@@@@@@@@ TEST ZONE TEST ZONE TEST ZONE@@@@@@@@@@
-##########################################################
-main = Enviroment()
-
-scooter = main.build_fleet(name="skouterakias", paths=DEFAULT_POINTS)
-athens_dactylios = main.build_webhook(name="athens_dactylios", paths=DEFAULT_GEOFENCE).deploy_webhook()
-
-
-def test_case(test_name, fleet_name, wh, int1, int2):
-	if ARGS.get('defaults'):
-		"""
-		sets the default test parameters. (geofence /point files)
-		Can be bypassed by setting  'default=False'
-		when instantiating the class Enviroment
-		"""
-		##  example
-
-		test_case = Enviroment(name=test_name)
-		wh = test_case.build_webhook(name=wh, paths=DEFAULT_GEOFENCE)
-		wh.deploy_webhook(int1, int2)
-
-		scooter = test_case.build_fleet(name=fleet_name, paths=DEFAULT_POINTS)
-		scooter.create_steps()
-		scooter.run_sequence()
-		time.sleep(1)
-
-		scooter.drop_fleet()
-		wh.kill_webhook()
-		time.sleep(1)
-
-
-test_case(
-		test_name="test_1",
-		wh="athens_dactylios1",
-		int1=0,
-		int2=60,
-		fleet_name="case_1"
-)
-
-test_case(
-		test_name="test_2",
-		wh="athens_dactylios2",
-		int1=0,
-		int2=60,
-		fleet_name="case_1"
-
-)
-
-test_case(
-		test_name="test_2",
-		wh="athens_dactylios3",
-		int1=0,
-		int2=60,
-		fleet_name="case_2"
-
-)
-test_case(
-		test_name="test_3",
-		wh="athens_dactylios4",
-		int1=0,
-		int2=60,
-		fleet_name="case_1"
-
-)
-test_case(
-		test_name="test_3",
-		wh="athens_dactylios5",
-		int1="-inf",
-		int2=-5,
-		fleet_name="case_2"
-
-)
