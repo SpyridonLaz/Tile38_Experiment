@@ -62,9 +62,8 @@ class Generic_Mixin:
 		:rtype: integer
 		"""
 		##   Unix timestamp in seconds
-		stamp = dt.datetime.now
-		time = dt.datetime.timestamp
-		return int(time(stamp()) + interval)
+		stamp = datetime.now().timestamp()
+		return int(stamp) + interval
 
 	def _zenity_dialog(self, prompt_title="title", zenity_args=""):
 
