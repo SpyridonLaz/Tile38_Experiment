@@ -21,14 +21,15 @@ against Z.
 #### We need to figure:
 
 1. If a geofence is aware of any object points that have a Unix timestamp at Z.
+
    **Result**: positive / negative
    **types of event to consider**: any
 2. Which events* are emitted from geofence webhook upon detection of object
    on each case:
    a) with Z timestamp .
    b) without Z timestamp .
-   c) Result: Same / Different
-   *types of event to consider: cross,enter,inside,exit
+   *Result:* Same / Different
+   *types of event to consider:* cross,enter,inside,exit
 3. What types of events* are emitted from geofence webhook upon detection of object that is
    filtered against Z property:
    a) with timestamp in accepted range.
