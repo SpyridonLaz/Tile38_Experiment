@@ -23,18 +23,24 @@ against Z.
 1. If a geofence is aware of any object points that have a Unix timestamp at Z.
 
    **Result**: positive / negative
+
    **types of event to consider**: any
 2. Which events* are emitted from geofence webhook upon detection of object
    on each case:
    a) with Z timestamp .
    b) without Z timestamp .
-   *Result:* Same / Different
-   *types of event to consider:* cross,enter,inside,exit
+
+   **Result:** Same / Different
+
+   **types of event to consider:** cross,enter,inside,exit
 3. What types of events* are emitted from geofence webhook upon detection of object that is
    filtered against Z property:
+
    a) with timestamp in accepted range.
+
    b) With Z timestamp out of accepted range
-   *types of event to consider: cross,enter,inside,exit
+
+   **types of event to consider:** cross,enter,inside,exit
 
 ## Experiment:
 
@@ -130,9 +136,11 @@ In response to the initial question of the assignment, the answer is that indeed
 Webhooks are completely aware of all the objects of a given collection that are set to
 observe, regardless of wether the objects have a Z property or not.
 
-However, when using a filter against Z , then the results are very different. Objects that are
-either outside of the spatial boundaries X,Y and/or the temporal boundaries of Z trigger
-events,but still detected as outside of the Geofence.**
+However, when using a filter against Z , then the results are very different. 
+
+**Objects that move
+either beyond the spatial boundaries X,Y or the temporal boundaries of Z trigger
+events, yet are detected as being outside of the geofence.**
 
 ## PYTHON DOCUMENTATION
 
@@ -201,7 +209,7 @@ $ python3 -i dispatch.py
 
 C) DJANGO CODE
 
-```
+```python
 import json
 class webhook(GenericViewSet, CreateModelMixin):
         permission_classes = [AllowAny]
