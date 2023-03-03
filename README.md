@@ -217,19 +217,16 @@ class webhook(GenericViewSet, CreateModelMixin):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path = path.resolve()
                 print(payload,log_detect )
-```
-
-```
-list = [ 
-             log_detect,
-              log_time,
-               log_coords,
-                log_id,
-                  log_key,]
-       _list= " : ".join([str(item) for item in _list])
-       with path.open ("a+") as f:
-               f.write(_list + "\n")
-       return Response(status=200)
+                list = [ 
+                       log_detect,
+                        log_time,
+                         log_coords,
+                          log_id,
+                            log_key,]
+                 _list= " : ".join([str(item) for item in _list])
+                 with path.open ("a+") as f:
+                         f.write(_list + "\n")
+                 return Response(status=200)
 ```
 
 
